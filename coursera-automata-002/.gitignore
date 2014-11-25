@@ -1,0 +1,6 @@
+submit.py
+*.html
+*.json
+.DS_Store
+*.pdf
+*.pyc
