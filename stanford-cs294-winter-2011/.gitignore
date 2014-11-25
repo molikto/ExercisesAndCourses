@@ -1,0 +1,3 @@
+*.mat
+train-images-idx3-ubyte
+.DS_Store
