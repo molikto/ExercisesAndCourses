@@ -1,0 +1,90 @@
+.include "./nominal.jsim"
+.include "./stdcell.jsim"
+* .include "./lab3adder.jsim"
+* .include "./lab3compare.jsim"
+* .include "./lab3boolean.jsim"
+* .include "./lab3shifter.jsim"
+* .include "./lab3checkoff_6.jsim"
+
+
+* fulladder
+
+.subckt fulladder a b ci s co
+Xxorab a b axorb xor2
+Xxorall axorb ci s xor2
+Xand1 a b r1 and2
+Xand2 a ci r2 and2
+Xand3 b ci r3 and2
+Xor1 r1 r2 r3 co or3
+.ends
+
+
+* nor helper
+.subckt nor16 a[15:0] z
+Xnor1 a0 a1 a2 a3 b1 nor4
+Xnor2 a4 a5 a6 a7 b2 nor4
+Xnor3 a8 a9 a10 a11 b3 nor4
+Xnor4 a12 a13 a14 a15 b4 nor4
+Xnor5 b1 b2 b3 b4 z and4
+.ends
+
+* add or sub / num a / num b / is zero / overflows / negative
+.subckt adder32 alufn[0] a[31:0] b[31:0] s[31:0] z v n
+Xchoice b[31:0] alufn0#32 d[31:0] xor2
+.connect alufn0 c0
+xfa a[31:0] d[31:0] c[31:0] s[31:0] c[32:1] fulladder
+Xoverflow c31 c32 v xor2
+.connect s31 n
+Xnor1 s0 s1 s2 s3 s4 s5 s6 s7 s8 s9 s10 s11 s12 s13 s14 s15 z1 nor16
+Xnor2 s16 s17 s18 s19 s20 s21 s22 s23 s24 s25 s26 s27 s28 s29 s30 s31 z2 nor16
+Xand z1 z2 z and2
+.ends
+
+.subckt compare32 alufn[2:1] z v n cmp[31:0]
+Xnxorv n v nxorv xor2
+Xandless alufn2 nxorv less and2
+Xandeq alufn1 z eq and2
+.connect cmp[1:31] 0
+Xorcmp eq less cmp0 or2
+.ends
+
+.subckt boole32 alufn[3:0] a[31:0] b[31:0] boole[31:0]
+Xand a0 b0 rand and2
+Xbi b0 bi inverter
+Xai a0 ai inverter
+Xabi a0 bi abi  and2
+Xaib ai b0 aib and2
+Xr1 alufn3 rand r1 and2
+Xr2 alufn2 aib r2 and2
+Xr3 alufn1 abi r3 and2
+Xr r1 r2 r3 boole0 or3
+.connect boole[31:1] boole0
+.ends
+
+* b: 16 8 4 2 1
+.subckt shift32 alufn[1:0] a[31:0] b[4:0] shift[31:0]
+Xel alufn1#32 a31#32 e[31:0] and2
+Xec alufn0#32 a[0:31] a[31:0] e[32:63] mux2
+Xer alufn1#32 a31#32 e[95:64] and2
+Xs16a b4#16 e[0:15] e[80:95] f[0:15] mux2
+Xs16b b4#80 e[16:95] e[0:79] f[16:95] mux2
+Xs8a b3#8 f[0:7] f[88:95] g[0:7] mux2
+Xs8b b3#88 f[8:95] f[0:87] g[8:95] mux2
+Xs4a b2#4 g[0:3] g[92:95] h[0:3] mux2
+Xs4b b2#92 g[4:95] g[0:91] h[4:95] mux2
+Xs2a b1#2 h[0:1] h[94:95] i[0:1] mux2
+Xs2b b1#94 h[2:95] h[0:93] i[2:95] mux2
+Xs1a b0#1 i[0:0] i[95:95] j[0:0] mux2
+Xs1b b0#95 i[1:95] i[0:94] j[1:95] mux2
+Xout alufn0#32 j[32:63] j[63:32] shift[0:31] mux2
+.ends
+
+.subckt alu alufn[5:0] a[31:0] b[31:0] alu[31:0] z v n
+Xadder alufn0 a[31:0] b[31:0] radder[31:0] z v n adder32
+Xboole alufn[3:0] a[31:0] b[31:0] rboole[31:0] boole32
+Xshift alufn[1:0] a[31:0] b[4:0] rshift[31:0] shift32
+Xcmp alufn[2:1] z v n rcmp[31:0] compare32
+Xmux alufn4#32 alufn5#32 radder[31:0] rboole[31:0] rshift[31:0] rcmp[31:0] alu[31:0] mux4
+.ends
+
+

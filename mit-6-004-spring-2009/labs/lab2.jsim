@@ -1,0 +1,37 @@
+.include "./lab0.jsim"
+
+.include "./lab2checkoff.jsim"
+
+.subckt fulladder a b ci s co
+Xxorab a b axorb xor
+Xxorall axorb ci s xor
+Mpu1 z b 11 vdd PENH sw=8 sl=1
+Mpu2 z a 11 vdd PENH sw=8 sl=1
+Mpu3 11 a 22 vdd PENH sw=8 sl=1
+Mpu4 11 ci 22 vdd PENH sw=8 sl=1
+Mpu5 22 b vdd vdd PENH sw=8 sl=1
+Mpu6 22 ci vdd vdd PENH sw=8 sl=1
+Mpd1 z a 1 0 NENH sw=8 sl=1
+Mpd2 1 b 0 0 NENH sw=8 sl=1
+Mpd3 z a 2 0 NENH sw=8 sl=1
+Mpd4 2 ci 0 0 NENH sw=8 sl=1
+Mpd5 z b 3 0 NENH sw=8 sl=1
+Mpd6 3 ci 0 0 NENH sw=8 sl=1
+Xinv z co inv
+.ends
+
+/*
+Xtestfa vdd vdd vdd s c fulladder
+Vol vol 0 0.3v
+Voh voh 0 3.0v
+
+.tran 20ns
+.plot s c vol voh
+*/
+
+.subckt adder4 a3 a2 a1 a0 b3 b2 b1 b0 s4 s3 s2 s1 s0
+Xbit0 a0 b0 0 s0 c0 fulladder
+Xbit1 a1 b1 c0 s1 c1 fulladder
+Xbit2 a2 b2 c1 s2 c2 fulladder
+Xbit3 a3 b3 c2 s3 s4 fulladder
+.ends

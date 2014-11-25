@@ -1,0 +1,69 @@
+.include "./nominal.jsim"
+
+/*
+Vmeter vds drain 0v
+Vds vds 0 0v
+Vgs gate 0 0v
+M1 drain gate 0 0 NENH W=1.2u L=600n
+.dc Vds 0 5 .1 Vgs 0 5 1
+.plot I(Vmeter)
+*/
+
+.subckt nand2 a b z
+Mpd1 z a 1 0 NENH sw=8 sl=1
+Mpd2 1 b 0 0 NENH sw=8 sl=1
+Mpu1 z a vdd vdd PENH sw=8 sl=1
+Mpu2 z b vdd vdd PENH sw=8 sl=1
+.ends
+
+.subckt inv a z
+Mpd z a 0 0 NENH sw=16 sl=1
+Mpu z a vdd vdd PENH sw=16 sl=1
+.ends
+
+.subckt nor2 a b z
+Mpd1 z a 0 0 NENH sw=8 sl=1
+Mpd2 z b 0 0 NENH sw=8 sl=1
+Mpu1 z a 1 vdd PENH sw=8 sl=1
+Mpu2 1 b vdd vdd PENH sw=8 sl=1
+.ends
+
+/*
+Xtest vin vin vout nand2
+Vin vin 0 0v
+Vol vol 0 0.3v
+Voh voh 0 3v
+.dc Vin 0 3.3 .005
+.plot vin vout voh vol
+
+Xdriver vin nin inv
+Xtest vdd nin nout nand2
+Cload nout 0 .02pf
+Vin vin 0 pulse(3.3,0,5ns,.1ns,.1ns,4.8ns)
+Vol vol 0 0.3v
+Vil vil 0 0.6v
+Vih vih 0 2.6v
+Voh voh 0 3.0v
+
+.tran 20ns
+.plot vin
+.plot nin nout vol vil vih voh
+*/
+
+
+* from the lab instruction
+.subckt xor a b z
+Xnor a b anorb nor2
+Mpu1 z anorb 1 vdd PENH sw=4 sl=1
+Mpu2 1 a vdd vdd PENH sw=4 sl=1
+Mpu3 1 b vdd vdd PENH sw=4 sl=1
+Mpd1 z a 2 0 NENH sw=2 sl=1
+Mpd2 2 b 0 0 NENH sw=2 sl=1
+Mpd3 z anorb 0 0 NENH sw=2 sl=1
+.ends
+
+/*
+Xtestxor vdd vdd out xor
+.tran 20ns
+.plot out
+*/

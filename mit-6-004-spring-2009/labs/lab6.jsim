@@ -1,0 +1,127 @@
+.include "./lab3.jsim"
+* .include "./lab6pc.jsim"
+* .include "./lab6regfile.jsim"
+* .include "./lab6ctl.jsim"
+.include "./lab6basicblock.jsim"
+
+
+.subckt pc clk reset ia[31:0]
+Xnum4a num4[31:3] num4[1:0] constant0
+Xnum4b num4[2] constant1
+Xadder 0 ia[31:0] num4[31:0] iaplus4[31:0] z v n adder32
+Xmux reset#32 iaplus4[31:0] 0#32 nex[31:0] mux2
+Xpc nex[31:0] clk#32 ia[31:0] dreg
+.ends
+
+.subckt force0 ra[4:0] adata[31:0] radata[31:0]
+X1 ra4 ra3 r1 nand2
+X2 ra2 ra1 ra0 r2 nand3
+X3 r1 r2 r nor2
+X4 r#32 adata[31:0] 0#32 radata[31:0] mux2
+.ends
+
+.subckt regfile clk werf ra2sel ra[4:0] rb[4:0] rc[4:0]
++ wdata[31:0] radata[31:0] rbdata[31:0]
+Xregfile
++ vdd 0 0 ra[4:0] adata[31:0]
++ vdd 0 0 ra2mux[4:0] bdata[31:0]
++ 0 clk werf rc[4:0] wdata[31:0]
++ $memory width=32 nlocations=31
+Xra2mux ra2sel#5 rb[4:0] rc[4:0] ra2mux[4:0] mux2
+Xforce1 ra[4:0] adata[31:0] radata[31:0] force0
+Xforce2 ra2mux[4:0] bdata[31:0] rbdata[31:0] force0
+.ends
+
+.subckt ctl reset id[31:26] ra2sel bsel alufn[5:0] wdsel[1:0] werf moe wr
+Xctl vdd 0 0 id[31:26]
++ pcsel[2:0] wasel asel ra2sel bsel alufn[5:0] wdsel[1:0] werf moe xwr // this is read only memory, the configrations for each op is written here!!! beautiful!!!
++ $memory width=18 nlocations=64 contents=(
+    + 0b000000000000000000      // opcode = 0b000000 = 0
+    + 0b000000000000000000      // opcode = 0b000001 = 1
+    + 0b000000000000000000      // opcode = 0b000010 = 2
+    + 0b000000000000000000      // opcode = 0b000011 = 3
+    + 0b000000000000000000      // opcode = 0b000100 = 4
+    + 0b000000000000000000      // opcode = 0b000101 = 5
+    + 0b000000000000000000      // opcode = 0b000110 = 6
+    + 0b000000000000000000      // opcode = 0b000111 = 7
+    + 0b000000000000000000      // opcode = 0b001000 = 8
+    + 0b000000000000000000      // opcode = 0b001001 = 9
+    + 0b000000000000000000      // opcode = 0b001010 = 10
+    + 0b000000000000000000      // opcode = 0b001011 = 11
+    + 0b000000000000000000      // opcode = 0b001100 = 12
+    + 0b000000000000000000      // opcode = 0b001101 = 13
+    + 0b000000000000000000      // opcode = 0b001110 = 14
+    + 0b000000000000000000      // opcode = 0b001111 = 15
+    + 0b000000000000000000      // opcode = 0b010000 = 16
+    + 0b000000000000000000      // opcode = 0b010001 = 17
+    + 0b000000000000000000      // opcode = 0b010010 = 18
+    + 0b000000000000000000      // opcode = 0b010011 = 19
+    + 0b000000000000000000      // opcode = 0b010100 = 20
+    + 0b000000000000000000      // opcode = 0b010101 = 21
+    + 0b000000000000000000      // opcode = 0b010110 = 22
+    + 0b000000000000000000      // opcode = 0b010111 = 23
+    + 0b000000100000010110      // opcode = 0b011000 = 24 = LD
+    + 0b000001100000001001      // opcode = 0b011001 = 25 = ST
+    + 0b000000000000000000      // opcode = 0b011010 = 26
+    + 0b000000000000000000      // opcode = 0b011011 = 27
+    + 0b000000000000000000      // opcode = 0b011100 = 28
+    + 0b000000000000000000      // opcode = 0b011101 = 29
+    + 0b000000000000000000      // opcode = 0b011110 = 30
+    + 0b000000000000000000      // opcode = 0b011111 = 31
+    + 0b000000000000001100      // opcode = 0b100000 = 32 = ADD
+    + 0b000000000000101100      // opcode = 0b100001 = 33 = SUB
+    + 0b000000000000000000      // opcode = 0b100010 = 34
+    + 0b000000000000000000      // opcode = 0b100011 = 35
+    + 0b000000011001101100      // opcode = 0b100100 = 36 = CMPEQ
+    + 0b000000011010101100      // opcode = 0b100101 = 37 = CMPLT
+    + 0b000000011011101100      // opcode = 0b100110 = 38 = CMPLE
+    + 0b000000000000000000      // opcode = 0b100111 = 39
+    + 0b000000001100001100      // opcode = 0b101000 = 40 = AND
+    + 0b000000001111001100      // opcode = 0b101001 = 41 = OR
+    + 0b000000001011001100      // opcode = 0b101010 = 42 = XOR
+    + 0b000000000000000000      // opcode = 0b101011 = 43
+    + 0b000000010000001100      // opcode = 0b101100 = 44 = SHL
+    + 0b000000010000101100      // opcode = 0b101101 = 45 = SHR
+    + 0b000000010001101100      // opcode = 0b101110 = 46 = SRA
+    + 0b000000000000000000      // opcode = 0b101111 = 47
+    + 0b000000100000001100      // opcode = 0b110000 = 48 = ADDC
+    + 0b000000100000101100      // opcode = 0b110001 = 49 = SUBC
+    + 0b000000000000000000      // opcode = 0b110010 = 50
+    + 0b000000000000000000      // opcode = 0b110011 = 51
+    + 0b000000111001101100      // opcode = 0b110100 = 52 = CMPEQC
+    + 0b000000111010101100      // opcode = 0b110101 = 53 = CMPLTC
+    + 0b000000111011101100      // opcode = 0b110110 = 54 = CMPLEC
+    + 0b000000000000000000      // opcode = 0b110111 = 55
+    + 0b000000101100001100      // opcode = 0b111000 = 56 = ANDC
+    + 0b000000101111001100      // opcode = 0b111001 = 57 = ORC
+    + 0b000000101011001100      // opcode = 0b111010 = 58 = XORC
+    + 0b000000000000000000      // opcode = 0b111011 = 59
+    + 0b000000110000001100      // opcode = 0b111100 = 60 = SHLC
+    + 0b000000110000101100      // opcode = 0b111101 = 61 = SHRC
+    + 0b000000110001101100      // opcode = 0b111110 = 62 = SRAC
+    + 0b000000000000000000      // opcode = 0b111111 = 63
++ )
+Xresetwr reset xwr 0 wr mux2
+.ends
+
+* so it is like:
+* pc give to memory, memory give us instruction data
+* instruction data to ctl, and control bits is get
+.subckt beta
++ clk reset // from test
++ ia[31:0] // output of the pc reg
++ id[31:0] // then what instruction is get from test from here
++ ma[31:0] // memory data address, from alu
++ moe // from control logic, used by test memory
++ mrd[31:0] // data read from memory
++ wr // memory write enabled, give it to test memory 
++ mwd[31:0] // memory write data, from reg
+Xpc clk reset ia[31:0] pc
+Xctl reset id[31:26] ra2sel bsel alufn[5:0] wdsel[1:0] werf moe wr ctl
+Xregfile
+	+ clk werf ra2sel id[20:16] id[15:11] id[25:21]
+	+ wdata[31:0] radata[31:0] mwd[31:0] regfile
+Xalu alufn[5:0] radata[31:0] bseldata[31:0] ma[31:0] z v n alu
+Xbsel bsel#32 mwd[31:0] id15#16 id[15:0] bseldata[31:0] mux2
+xwdsel wdsel0#32 wdsel1#32 0#32 ma[31:0] mrd[31:0] 0#32 wdata[31:0] mux4
+.ends
