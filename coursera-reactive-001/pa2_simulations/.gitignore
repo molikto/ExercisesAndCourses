@@ -1,0 +1,13 @@
+target/
+
+.idea/
+.idea_modules/
+project/project/
+project/target/
+lib_managed/
+submission/
+.DS_Store
+.classpath
+*.html
+*.json
+*.pdf
