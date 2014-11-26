@@ -1,0 +1,8 @@
+[package]
+
+name = "nothing_at_all"
+version = "0.0.1"
+authors = ["molikto"]
+
+[[bin]]
+name = "nothing"
