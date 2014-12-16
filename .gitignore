@@ -4,3 +4,16 @@ input
 *.out
 *.in
 target
+
+*.o
+*.hl
+*.ll
+
+coursera-nlangp-001/pa3/corpus.en
+coursera-nlangp-001/pa3/corpus.es
+coursera-nlangp-001/pa3/debug.en
+coursera-nlangp-001/pa3/debug.es
+coursera-nlangp-001/pa3/dev.en
+coursera-nlangp-001/pa3/dev.es
+coursera-nlangp-001/pa3/test.en
+coursera-nlangp-001/pa3/test.es
