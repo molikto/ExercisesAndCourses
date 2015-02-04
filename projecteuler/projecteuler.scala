@@ -525,5 +525,94 @@ def p030 = {
   (2 to 413343).filter(i => i.toString.map(_ - '0').map(_ pow 4).sum == i).sum
 }
 
-profile(p030)
+def p031 = {
+  val coins = Seq(2, 5, 10, 20, 50, 100, 200)
+  var c = 0
+  for (i200 <- 0 to (200 / 200)) {
+    for (i100 <- 0 to (200 / 100)) {
+      for (i50 <- 0 to (200 / 50)) {
+        for (i20 <- 0 to (200 / 20)) {
+          for (i10 <- 0 to (200 / 10)) {
+            for (i5 <- 0 to (200 / 5)) {
+              for (i2 <- 0 to (200 / 2)) {
+                if (i2 * 2 + i5 * 5 + i10 * 10 + i20 * 20 + i50 * 50 + i100 * 100 + i200 * 200 <= 200) {
+                  c += 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  c
+}
+
+
+def p032 = {
+  (1 to 9).toList.permutations.map(is => {
+    (for (s <- 0 until 8; k <- (s + 1) until 8) yield {
+
+        val a = is.slice(0, s + 1).mkString.toInt
+        val b = is.slice(s + 1, k + 1).mkString.toInt
+        val c = is.slice(k + 1, is.size).mkString.toInt
+        if (a * b == c) {
+          Some(c)
+        } else None
+    }).flatten
+  }).flatten.toList.distinct.sum
+}
+
+def p034 = {
+  (10 to 2903040).filter(i => i.toString.map(a => t(a - '0')).sum == i + B0).sum
+}
+
+def p035 = {
+  val ps = prime.until1(1000000)
+  ps.count(p => {
+    val cs = p.toString
+    (1 until cs.size).forall(i => ps.contains((cs.drop(i) + cs.take(i)).toInt))
+  })
+}
+
+def p036 = {
+  (0 until 1000000).filter(i => i.toString == i.toString.reverse && Integer.toBinaryString(i) == Integer.toBinaryString(i).reverse).sum
+}
+
+def p037 = {
+  val ps = prime.until1(1000000)
+  ps.filter(p => {
+    val cs = p.toString
+    cs.size > 1 && (1 until cs.size).map(i => cs.drop(i).toInt).forall(k => ps.contains(k)) && (1 until cs.size).map(i => cs.dropRight(i).toInt).forall(k => ps.contains(k))
+  }).sum
+}
+
+def p038 = (2 to 9).map(i => 1 to i).map(ms => Stream.from(1).map(k => ms.map(a => (k * a).toString).mkString.toLong).takeWhile(_ <= 987654321).filter(_.toString.sorted == "123456789")).flatten.max
+
+
+def p039 = (1 to 1000).maxBy(i => {
+  (for (a <- 1 until i; b <- 1 until Math.min(a + 1, i - a)) yield a * a + b * b == (i - a - b) * (i - a - b)).count(a => a)
+})
+
+def p040 = {
+  val a = new StringBuilder
+  var i = 1
+  while (a.size <= 1000000) {
+    a.append(i)
+    i += 1
+  }
+  (a(0) - '0') * (a(9) - '0') * (a(99) - '0') * (a(999) - '0') * (a(9999) - '0') * (a(99999) - '0') * (a(999999) - '0')
+}
+
+def p041 = {
+  (4 to 9).map(i => (1 to i).mkString.permutations.map(_.toInt).filter(a => prime.is(a))).flatten.max
+}
+
+
+def p042 = {
+  val p = Seq(2,3, 5, 7, 11, 13, 17)
+  (0 to 9).permutations.filter(_(0) != '0').filter(n => (1 to 7).forall(i => n.slice(i, i + 3).mkString.toInt % p(i - 1) == 0)).map(_.mkString.toLong).sum
+}
+
+profile(p042)
 
