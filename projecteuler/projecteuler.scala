@@ -146,7 +146,8 @@ object prime {
 
   def is(p: BigInt): Boolean = until0(sqrt(p) + 1).forall(p % _ != B0)
   def is(p: Int): Boolean = {
-    if (p % 2 == 0) false else if (p % 3 == 0) false else
+    if (p < 0) false
+    else if (p % 2 == 0) false else if (p % 3 == 0) false else
     until1(Math.sqrt(p).toInt + 1).forall(p % _ != 0)
   }
 
@@ -614,5 +615,97 @@ def p042 = {
   (0 to 9).permutations.filter(_(0) != '0').filter(n => (1 to 7).forall(i => n.slice(i, i + 3).mkString.toInt % p(i - 1) == 0)).map(_.mkString.toLong).sum
 }
 
-profile(p042)
+// p43 lost
 
+def p44 = {
+  var m = Long.MaxValue
+  var ps = Vector.empty[Long]
+  def p(n: Int) = {
+    if (ps.size <= n) {
+      for (i <- ps.size to n) {
+        ps = ps :+1l * (i * (3 * i - 1)) / 2
+      }
+    }
+    ps(n)
+  }
+  def isP0(n: Long, l: Int, r: Int): Boolean = {
+    if (l == r) false
+    else if (l == r - 1) ps(l) == n
+    else if (ps((l + r) / 2) == n) true
+    else if (ps((l + r) / 2) > n) isP0(n, l, (l + r) / 2)
+    else isP0(n, (l + r) / 2, r)
+  }
+  def isP(n: Long): Boolean = isP0(n, 0, ps.length)
+
+  var c = 1
+  while (1l * c * 3 -1 < m) {
+    p(2 * c)
+    for (j <- 1 until c) {
+      if (isP(p(j) + p(c)) && isP(p(c) - p(j))) {
+        m = p(c) - p(j) min m
+        print(m)
+      }
+    }
+    c = c + 1
+  }
+  m
+}
+
+
+def p45 = {
+  var it, ip, ih = 1
+  var k = 0l
+  def p(i: Int) = 1l * i * (3 * i - 1) / 2
+  def t(i: Int) = 1l * i * (i + 1) / 2
+  def h(i: Int) = 1l * i * (2 * i - 1)
+  while (k <= 40755) {
+    val x = h(ih)
+    while (p(ip) < x) ip += 1
+    while (t(it) < x) it += 1
+    if (x == p(ip) && x == t(it)) {
+      println(x)
+      k = x
+    }
+    ih += 1
+  }
+  k
+}
+
+def p46 = Stream.from(1, 2) find { odd => !prime.is(odd) && (1 to Math.sqrt(odd).toInt).exists(k => prime.is(odd - 2 * k * k)) }
+
+def p47 = Stream.from(1).find { k => Seq(k, k + 1, k + 2, k + 3).forall(k => factors(k).size == 4) }
+
+def p48 = (1 to 1000).map(i => BigInt(i)).map(k => k.modPow(k, 10000000000l)).sum mod 10000000000l
+
+
+def p49 = {
+  val base = prime.until2(10000).filter(_ >= 1000)
+  base.flatMap(i => base.filter(_ > i).map(k => Seq(i, k, k * 2 - i))).filter(p => base.contains(p(2))).filter(p => {
+    val strs = p.map(k => k.toString.sorted)
+    strs(0) == strs(1) && strs(1) == strs(2)
+  })
+}
+
+def p50: Int = {
+  val max = 1000000
+  val base = prime.until1(max).toArray
+  var l = 0
+  val sums = new Array[Int](base.length)
+  var last = -1
+  while (l < base.length && sums(0) < max) {
+    var exist = false
+    var k = 0
+    while (k < sums.size - l) {
+      sums(k) = sums(k) + base(k + l)
+      if (!exist && prime.is(sums(k)) && (sums(k) < max)) {
+        last = sums(k)
+        exist = true
+      }
+      k += 1
+    }
+    l += 1
+  }
+  last
+}
+
+println(p50)
