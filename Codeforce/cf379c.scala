@@ -10,20 +10,25 @@ object Main {
 
     val r = new Array[Int](a.size)
 
-    // this is a rather silly answer
-    // you should zipWithIndex.sortBy(a._1)
-    // the thing: use range tree
-    // please never think by index!! they are names!!!
     for (i <- 0 until a.length) {
       val exp = a(i)
-      val v = used.floorEntry(a(i))
-      val (p , e) = if (v == null || v.getValue < exp) (exp, exp + 1) else (v.getValue, v.getValue + 1)
-      r(i) = p
-      if (used.containsKey(e)) {
-        used.put(p, used.get(e))
-        used.remove(e)
-      } else
-        used.put(p, e)
+      val v = used.floorEntry(exp)
+      if (v == null || v.getValue < exp) {
+        r(i) = exp
+        if (used.containsKey(exp + 1)) {
+          used.put(exp, used.get(exp + 1))
+          used.remove(exp + 1)
+        } else
+          used.put(exp, exp + 1)
+      } else {
+        r(i) = v.getValue
+        if (used.containsKey(v.getValue + 1)) {
+          used.put(v.getKey, used.get(v.getValue + 1))
+          used.remove(v.getValue + 1)
+        } else {
+          used.put(v.getKey, v.getValue + 1)
+        }
+      }
     }
 
     print(r.mkString(" "))

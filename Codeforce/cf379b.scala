@@ -7,14 +7,37 @@ object Main {
     val n = input.next().toInt
     val a = input.next().split(" ").map(_.toInt).toList.toArray
 
-    var used = scala.collection.mutable.TreeSet.empty[Int]
+    val sum = a.sum
 
-    val v = new Array[Int](a.size)
+    var cu = 0
+    var p = 0
 
-    for (i <- 0 until a.length) {
-      var exp = a(i)
-      val range = used.from(exp).takeWhile(i => if (i == exp) {exp += 1; true} else false)
-
+    var l = List.empty[Char]
+    while (cu < sum) {
+      if (a(p) == 0) {
+        l = 'R' :: l
+        p += 1
+      } else if (p == a.length - 1) {
+        l = 'R' :: 'L' :: 'P' :: l
+        a(p) -= 1
+        cu += 1
+      } else if (p+1 < a.size && a(p+1) > 0 && a(p) > 1) {
+        l = 'L' :: 'P' :: 'R' :: 'P' :: l
+        cu += 2
+        a(p) -= 1
+        a(p+1) -= 1
+      } else if (a(p) > 1) {
+        l = 'L' :: 'R' :: 'P' :: l
+        a(p) -= 1
+        cu += 1
+      } else {
+        l = 'R' :: 'P' :: l
+        a(p) -= 1
+        cu += 1
+        p += 1
+      }
     }
+    while (l.head != 'P') l = l.tail
+    print(l.reverse.mkString)
   }
 }
