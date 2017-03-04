@@ -17,3 +17,5 @@ coursera-nlangp-001/pa3/dev.en
 coursera-nlangp-001/pa3/dev.es
 coursera-nlangp-001/pa3/test.en
 coursera-nlangp-001/pa3/test.es
+
+*.class
