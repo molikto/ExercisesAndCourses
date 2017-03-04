@@ -57,6 +57,8 @@ public class subset {
 		}
 	}
 
+	// we keep a table of 
+	// long[value of N][difference of two set] = number of partitions * 2
 	private static void problem(Scanner cin, Writer fw) throws IOException {
 		int N = cin.nextInt();
 		long[][] results = new long[N+1][];
