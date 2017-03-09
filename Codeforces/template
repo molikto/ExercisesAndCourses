@@ -1,0 +1,37 @@
+import java.io.ByteArrayInputStream
+
+import scala.collection.mutable
+
+object Main {
+
+  var dddd = false
+
+  def ptime() = if (dddd) println(System.currentTimeMillis())
+  def delog(a: String) = if (dddd) println(a)
+
+  def main(args: Array[String]) = {
+    /** setup **/
+    var debug: Object => Unit = null
+    if (!args.isEmpty && args.head == "test") {
+      dddd = true
+      debug = println
+      val TEST =
+        """
+        """.stripMargin
+      System.setIn(new ByteArrayInputStream(TEST.getBytes))
+    } else {
+      debug = a => Unit
+    }
+    val input = scala.io.Source.stdin.getLines()
+
+    /** parse **/ ptime()
+
+    input.next()
+
+    /** algorithm **/ ptime()
+
+    /** print **/ ptime()
+
+    println(sol)
+  }
+}
