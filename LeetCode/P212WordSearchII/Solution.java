@@ -35,51 +35,43 @@ public class Solution {
 
     public List<String> findWords(char[][] board, String[] words) {
         Solution.board = board;
-//        HashMap<Character, ArrayList<Pos>> map = new HashMap<Character, ArrayList<Pos>>();
-//        for (int i = 0; i < board.length; i++) {
-//            mark[i]= new boolean[board[0].length];
-//            for (int j = 0; j < board[0].length; j++) {
-//                char c = board[i][j];
-//                ArrayList<Pos> pos =  map.get(c);
-//                if (pos == null) {
-//                    pos = new ArrayList<Pos>();
-//                    map.put(c, pos);
-//                }
-//                pos.add(new Pos(i, j));
-//            }
-//        }
         HashSet<String> found = new HashSet<String>();
+        int[] fraq = new int[26];
+        for (int j = board[0].length - 1; j >= 0; j--) {
+            for (int i = board.length - 1; i >= 0; i--) {
+                char c = board[i][j];
+                fraq[c - 'a'] += 1;
+            }
+        }
         for (String w : words) {
+            String o  = w;
+            if (fraq[w.charAt(0)- 'a'] > fraq[w.charAt(w.length() - 1) - 'a']) {
+                w = reverse(w);
+            }
             boolean mached = false;
-            for (int i = 0; !mached && i < board.length; i++) {
-                for (int j = 0; !mached && j < board[0].length; j++) {
+            for (int j = board[0].length - 1; !mached && j >= 0; j--) {
+                for (int i = board.length - 1; !mached && i >= 0; i--) {
                     char c = board[i][j];
                     if (c == w.charAt(0)) {
                         board[i][j] = 'A';
                         mached = match(i, j, w.substring(1));
                         board[i][j] = c;
                         if (mached) {
-                            found.add(w);
+                            found.add(o);
                         }
                     }
                 }
             }
         }
-//        for (String w : words) {
-//            ArrayList<Pos> head = map.get(w.charAt(0));
-//            if (head != null) {
-//                for (Pos p : head) {
-//                    mark[p.x][p.y] = true;
-//                    boolean mached = match(p.x, p.y, w.substring(1));
-//                    mark[p.x][p.y] = false;
-//                    if (mached) {
-//                        found.add(w);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
         return new ArrayList<String>(found);
+    }
+
+    private String reverse(String w) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = w.length()-1;i>=0;i--) {
+            sb.append(w.charAt(i));
+        }
+        return sb.toString();
     }
 
     private boolean match(int x, int y, String substring) {
