@@ -1,0 +1,4 @@
+
+[submodule "SICM/sicm"]
+	path = SICM/sicm
+	url = git@github.com:hnarayanan/sicm.git
