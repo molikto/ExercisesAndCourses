@@ -118,9 +118,9 @@
 		(
 			(v (velocity local))
 			(x (coordinate local))
-			(kin (* 1/2 mass (dot-product v v)))
+			(kin (* 1/2 mass (square v)))
 		)
-		(- kin (* 1/2 k (dot-product x x)))
+		(- kin (* 1/2 k (square x)))
 	)
 ) ; -1/2 mv^2 - 1/2 k x^2
 
@@ -142,8 +142,8 @@
 		(
 			(v (velocity local))
 			(x (coordinate local))
-			(kin (* 1/2 mass (dot-product v v)))
-			(grav (/ mu (sqrt (dot-product x x))))
+			(kin (* 1/2 mass (square v)))
+			(grav (/ mu (sqrt (square x))))
 		)
 		(+ kin grav)
 	)
@@ -188,7 +188,7 @@
 (define ((L-planar-pendulum m l g) local)
   (let ((q (coordinate local)) (v (velocity local)))
     (+
-     (* 1/2 m (square l) (square v))
+     (* 1/2 m (square (* l v)))
      (* m g l (cos q)))
       ))
 
@@ -197,7 +197,7 @@
    (literal-function 'theta))
   't))
 
-(todo "1.9 c")
+(todo "1.9")
 
 (exercise "1.10")
 
@@ -226,13 +226,49 @@
 
 (todo "1.10 c")
 
+(define ((L-bead-free m) local)
+  (let ((v (velocity local)))
+    (* 1/2 m (dot-product v v))))
 
 
+(define (spherical->rectangular local)
+  (let ((spherical-tuple (coordinate local)))
+    (let ((theta (ref spherical-tuple 1))
+          (phi (ref spherical-tuple 2)))
+      (let ((x (* 'a (sin theta) (cos phi)))
+            (y (* 'b (sin theta) (sin phi)))
+            (z (* 'c (cos theta))))
+        (up x y z)))))
+
+(define (L-bead-triaxial m)
+	(compose (L-bead-free m) (F->C spherical->rectangular)))
 
 
+(print-expression (((L-equations (L-bead-triaxial 'm)) q) 't))
 
 
+(define ((L-linkage m1 m2 m3 l1 l2 g) local)
+  (let ((q (coordinate local))
+        (v (velocity local)))
+    (let ((h (ref q 0))
+          (phi (ref q 1))
+          (theta (ref q 2))
+          (hdot (ref v 0))
+          (phidot (ref v 1))
+          (thetadot (ref v 2)))
+      (-
+       (+
+        (* 1/2 m2 (square hdot))
+        (* 1/2 m1 (square (+ hdot (* phidot l1))))
+        (* 1/2 m3 (square (+ hdot (* thetadot l2))))
+       (+
+        (* m2 g h)
+        (* m1 g (- h (* l1 (cos phi))))
+        (* m3 g (- h (* l2 (cos theta))))))))))
 
-
+(print-expression (((L-equations (L-linkage 'm1 'm2 'm3 'l1 'l2 'g))
+                    (up (literal-function 'h)
+                        (literal-function 'phi)
+                        (literal-function 'theta))) 't))
 
 
