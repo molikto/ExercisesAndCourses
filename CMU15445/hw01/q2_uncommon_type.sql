@@ -1,0 +1,1 @@
+select type, primary_title, runtime_minutes from (select *, rank() over (partition by type order by runtime_minutes desc) as rank from titles) as ranking where ranking.rank = 1 order by type, primary_title;
